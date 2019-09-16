@@ -7,7 +7,7 @@ Buy a business, order stock and get money every irl hour!
 2. Put it into your resources folder
 3. Import sql.sql into your database
 4. Edit the config to your liking
-5. Add `start el_bwh` to your server.cfg ***Make sure to add this after mysql-async and es_extended***
+5. Add `start el_business` to your server.cfg ***Make sure to add this after mysql-async and es_extended***
 6. Start it and you're good to go
 
 ## Documentation
