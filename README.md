@@ -12,7 +12,7 @@ Buy a business, order stock and get money every irl hour!
 
 ## Documentation
 Commands:
-- /business <- root admin command, shows possible sub-commands
+- /business <- root admin command, shows possible sub-commands - **make sure you have admin level 10+**
 - /business create <- admin command, allows you to create a business in your current location
 - /business list <- admin command, dumps list of current businesses into your console
 - /business reload <- admin command, reloads business data from database
