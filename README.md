@@ -1,6 +1,7 @@
 # el_business
 Business system for FiveM (ESX)  
 Buy a business, order stock and get money every irl hour!
+You can have employees, which get a cut from the income based on a formula that can be edited in the config. They can also buy stock for you (with their own money).  
 
 ## Installation
 1. Download the [resource](https://github.com/Elipse458/el_business/archive/master.zip)
@@ -12,7 +13,7 @@ Buy a business, order stock and get money every irl hour!
 
 ## Documentation
 Commands:
-- /business <- root admin command, shows possible sub-commands - **make sure you have admin level 10+**
+- /business <- root admin command, shows possible sub-commands - **make sure you have superadmin**
 - /business create <- admin command, allows you to create a business in your current location
 - /business list <- admin command, dumps list of current businesses into your console
 - /business reload <- admin command, reloads business data from database
