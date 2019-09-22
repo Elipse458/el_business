@@ -294,13 +294,14 @@ end
 
 RegisterNetEvent("esx_business:syncServer")
 AddEventHandler("esx_business:syncServer",function(data)
+    print(ESX.DumpTable(data))
     if Config.blip.enabled then
         for k,v in ipairs(blips) do
             RemoveBlip(v)
         end
         blips={}
     end
-    for k,v in ipairs(data) do
+    for k,v in pairs(data) do
         if Config.blip.enabled then
             local bl = AddBlipForCoord(v.position.buy.x,v.position.buy.y,v.position.buy.z)
             SetBlipDisplay(bl, 6)
@@ -329,23 +330,25 @@ AddEventHandler("esx_business:businessCreate",function()
     OpenCreateBusinessMenu()
 end)
 
+function counttbl(tbl) local cnt = 0; for _,_ in pairs(tbl) do cnt=cnt+1 end; return cnt end
+
 RegisterNetEvent("esx_business:businessList")
 AddEventHandler("esx_business:businessList",function()
-    if #businessData<1 then Citizen.Trace("No business info on client, if there is some on server, you should try running the `/business reload` command to sync server info") else
-        Citizen.Trace("esx_business: Started business dump")
-        for k,v in ipairs(businessData) do
-            Citizen.Trace("-"..tostring(v["id"]))
-            Citizen.Trace("|-> Name: "..v["name"])
-            Citizen.Trace("|-> Address: "..v["address"])
-            Citizen.Trace("|-> Description: "..v["description"])
-            Citizen.Trace("|-> Blip name: "..v["blipname"]~=nil and v["blipname"] or "Default")
-            Citizen.Trace("|-> Owner: "..(v["owner_name"]~=nil and v["owner_name"] or "N/A").." ("..(v["owner"]~=nil and v["owner"] or "N/A")..")")
-            Citizen.Trace("|-> Price: "..v["price"].."$")
-            Citizen.Trace("|-> Stock price: "..v["stock_price"].."$")
-            Citizen.Trace("L-> Earnings: "..v["earnings"].."$/h")
+    if counttbl(businessData)<1 then print("No business info on client, if there is some on server, you should try running the `/business reload` command to sync server info") else
+        print("esx_business: Started business dump")
+        for k,v in pairs(businessData) do
+            print("-"..tostring(v["id"]))
+            print("|-> Name: "..v["name"])
+            print("|-> Address: "..v["address"])
+            print("|-> Description: "..v["description"])
+            print("|-> Blip name: "..(v["blipname"]~=nil and v["blipname"] or Config.blip.name))
+            print("|-> Owner: "..(v["owner_name"]~=nil and v["owner_name"] or "N/A").." ("..(v["owner"]~=nil and v["owner"] or "N/A")..")")
+            print("|-> Price: "..v["price"].."$")
+            print("|-> Stock price: "..v["stock_price"].."$")
+            print("L-> Earnings: "..v["earnings"].."$/h")
         end
-        Citizen.Trace("esx_business: Finished business dump")
-        Citizen.Trace("esx_business: Dumped "..tostring(#businessData).." business(es) to console")
+        print("esx_business: Finished business dump")
+        print("esx_business: Dumped "..tostring(counttbl(businessData)).." business(es) to console")
     end
 end)
 
@@ -354,7 +357,7 @@ Citizen.CreateThread(function()
         local ped = GetPlayerPed(-1)
         local ppos = GetEntityCoords(ped)
         Citizen.Wait(10) -- change this to 0 if you're experiencing flickering
-        for id,business in ipairs(businessData) do
+        for id,business in pairs(businessData) do
             local x,y,z = business.position.buy.x,business.position.buy.y,business.position.buy.z
             if GetDistanceBetweenCoords(ppos,x,y,z,false)<Config.draw_distance then
                 if business.owner==nil then
@@ -384,7 +387,7 @@ Citizen.CreateThread(function() -- draw thread
     while true do
         Citizen.Wait(5)
         local ppos = GetEntityCoords(GetPlayerPed(-1))
-        for _,business in ipairs(businessData) do
+        for _,business in pairs(businessData) do
             local x,y,z = business.position.buy.x,business.position.buy.y,business.position.buy.z
             if GetDistanceBetweenCoords(ppos,x,y,z,false)<Config.draw_distance then
                 for k,v in ipairs(Config.display) do

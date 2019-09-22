@@ -6,26 +6,27 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 function reloadServerData()
     print("esx_business: Syncing businesses from database")
     dataCahe = {}
-    for key,val in ipairs(MySQL.Sync.fetchAll('SELECT * FROM businesses')) do
-        if val["owner"]~=nil and not namecache[val["owner"]] then namecache[val["owner"]]=MySQL.Sync.fetchAll("SELECT name,firstname,lastname FROM users WHERE identifier = @identifier",{["@identifier"]=val["owner"]})[1] end
-        dataCache[val["id"]] = {
-            id = val["id"],
-            name = val["name"],
-            address = val["address"],
-            description = val["description"],
-            blipname = val["blipname"]~=nil and val["blipname"] or Config.blip.name,
-            owner = val["owner"],
-            owner_name = val["owner"]~=nil and namecache[val["owner"]].name or "None",
-            owner_rp_name = val["owner"]~=nil and namecache[val["owner"]].firstname.." "..namecache[val["owner"]].lastname or "None",
-            price = val["price"],
-            earnings = val["earnings"],
-            position = json.decode(val["position"]),
-            stock_price = val["stock_price"],
-            employees = val["employees"]~=nil and json.decode(val["employees"]) or {},
-            taxrate = val["taxrate"]~=nil and val["taxrate"] or Config.default_tax_rate
+    local res = MySQL.Sync.fetchAll('SELECT * FROM businesses')
+    for key,val in ipairs(res) do
+        if val.owner~=nil and not namecache[val.owner] then namecache[val.owner]=MySQL.Sync.fetchAll("SELECT name,firstname,lastname FROM users WHERE identifier = @identifier",{["@identifier"]=val.owner})[1] end
+        dataCache[val.id] = {
+            id = val.id,
+            name = val.name,
+            address = val.address,
+            description = val.description,
+            blipname = (val.blipname~=nil and val.blipname~="") and val.blipname or Config.blip.name,
+            owner = val.owner,
+            owner_name = val.owner~=nil and namecache[val.owner].name or "None",
+            owner_rp_name = val.owner~=nil and namecache[val.owner].firstname.." "..namecache[val.owner].lastname or "None",
+            price = val.price,
+            earnings = val.earnings,
+            position = json.decode(val.position),
+            stock_price = val.stock_price,
+            employees = val.employees~=nil and json.decode(val.employees) or {},
+            taxrate = val.taxrate~=nil and val.taxrate or Config.default_tax_rate
         }
     end
-    print("esx_business: Synced "..tostring(#dataCache).." business(es) from database")
+    print("esx_business: Synced "..tostring(#res).." business(es) from database")
 end
 
 function addMoney(identifier,money,business)

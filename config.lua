@@ -12,7 +12,7 @@ end
 -- {name} - name of the business
 -- {address} - address of the business
 -- {description} - desctiption of the business
--- {blipname} - custom blip name (default '{blipname}')
+-- {blipname} - custom blip name (default Config.blip.name)
 -- {owner} - owner steamid (default nil)
 -- {owner_name} - owner steam name (default 'None')
 -- {owner_rp_name} - owner RP name (default 'None')
