@@ -262,7 +262,7 @@ end)
 
 ESX.RegisterServerCallback("esx_business:createBusiness", function(source,cb,business)
     local xPlayer = ESX.GetPlayerFromId(source)
-    if xPlayer.getPermissions()>=10 then
+    if xPlayer.getGroup()=="superadmin" then
         if not business then cb(false) end
         local bx,by,bz = table.unpack(business["buy_position"])
         local ax,ay,az = table.unpack(business["actions_position"])
