@@ -200,9 +200,9 @@ function editElements(elements,label,value)
     return elements
 end
 
-RegisterCommand("testing", function(a,b,c)
-    print(OpenParameterDialog(255))
-end, false)
+-- RegisterCommand("testing", function(a,b,c)
+--     print(OpenParameterDialog(255))
+-- end, false)
 
 function OpenCreateBusinessMenu()
     ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_create',
@@ -294,7 +294,6 @@ end
 
 RegisterNetEvent("esx_business:syncServer")
 AddEventHandler("esx_business:syncServer",function(data)
-    print(ESX.DumpTable(data))
     if Config.blip.enabled then
         for k,v in ipairs(blips) do
             RemoveBlip(v)
