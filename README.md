@@ -23,7 +23,8 @@ Commands:
 If you want to change the time when people receive money (default is every hour at :00) here's how you do it:  
 - Open `server.lua` and go to line 201
 - Change the '0' in `TriggerEvent("cron:runAt",i, *0* ,runMoneyCoroutines)` to a number between 0-59, that will be the minute when it gets executed  
-If you want to change the hours, i'll let you figure that out on your own as an exercise lol ([cron](https://github.com/ESX-Org/cron))  
+If you want to change the hours, i'll let you figure that out on your own as an exercise lol ([cron](https://github.com/ESX-Org/cron))
+- If the script doesn't give money to the player, try changing [line 40](https://github.com/Elipse458/el_business/blob/master/server.lua#L40) in server.lua to `xPlayer.addMoney(math.floor(money))`
 
 If find any bugs, please join my [discord server](https://discord.gg/GbT49uH) and report it in the #bug-reports channel  
 If you like my work, please check out [my page](https://elipse458.me), i'll probably release a few more things if i have the time and feel like it
