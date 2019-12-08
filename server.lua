@@ -37,7 +37,7 @@ function addMoney(identifier,money,business)
         local xPlayer = ESX.GetPlayerFromId(source)
         print("esx_business: Adding money to "..GetPlayerName(source).." - "..identifier.." ("..tostring(money).."$)")
         TriggerClientEvent('esx:showNotification', source, 'You received ~g~'..tostring(money)..'$~s~ from ~b~'..business)
-        xPlayer.addBank(math.floor(money))
+        xPlayer.addAccountMoney("bank", math.floor(money))
     else
         print("esx_business: An error occured while adding money to "..identifier.." ("..tostring(money).."$). The player is offline. Forcing adding money")
         MySQL.Sync.execute('UPDATE `users` SET `bank` = `bank` + @bank WHERE `identifier` = @identifier',{['@bank'] = money, ['@identifier'] = identifier})
