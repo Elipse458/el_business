@@ -24,7 +24,12 @@ If you want to change the time when people receive money (default is every hour 
 - Open `server.lua` and go to line 201
 - Change the '0' in `TriggerEvent("cron:runAt",i, *0* ,runMoneyCoroutines)` to a number between 0-59, that will be the minute when it gets executed  
 If you want to change the hours, i'll let you figure that out on your own as an exercise lol ([cron](https://github.com/ESX-Org/cron))
-- If the script doesn't give money to the player, try changing [line 40](https://github.com/Elipse458/el_business/blob/master/server.lua#L40) in server.lua to `xPlayer.addMoney(math.floor(money))`
+- If the script doesn't give money to the player, try changing [line 40](https://github.com/Elipse458/el_business/blob/master/server.lua#L40) in server.lua to `xPlayer.addMoney(math.floor(money))`  
+
+If you have someone in the businesses set as an owner of a business and their steamid is no longer in the users database, you need to set the owner of that business back to NULL. Here's a sql query that can do all of that automagically (might take longer with big users table)
+```sql
+UPDATE businesses SET owner=NULL WHERE owner IS NOT NULL AND NOT EXISTS (SELECT 1 FROM users WHERE businesses.owner = users.identifier)
+```  
 
 If find any bugs, please join my [discord server](https://discord.gg/GbT49uH) and report it in the #bug-reports channel  
 If you like my work, please check out [my page](https://elipse458.me), i'll probably release a few more things if i have the time and feel like it
