@@ -352,6 +352,7 @@ AddEventHandler("esx_business:businessList",function()
 end)
 
 Citizen.CreateThread(function()
+    Citizen.Wait(1500)
     while true do
         local ped = GetPlayerPed(-1)
         local ppos = GetEntityCoords(ped)

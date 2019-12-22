@@ -8,7 +8,8 @@ function reloadServerData()
     dataCahe = {}
     local res = MySQL.Sync.fetchAll('SELECT * FROM businesses')
     for key,val in ipairs(res) do
-        if val.owner~=nil and not namecache[val.owner] then namecache[val.owner]=MySQL.Sync.fetchAll("SELECT name,firstname,lastname FROM users WHERE identifier = @identifier",{["@identifier"]=val.owner})[1] end
+        hasowner = val.owner~=nil and val.owner~=""
+        if hasowner and not namecache[val.owner] then namecache[val.owner]=MySQL.Sync.fetchAll("SELECT name,firstname,lastname FROM users WHERE identifier = @identifier",{["@identifier"]=val.owner})[1] end
         dataCache[val.id] = {
             id = val.id,
             name = val.name,
@@ -16,14 +17,14 @@ function reloadServerData()
             description = val.description,
             blipname = (val.blipname~=nil and val.blipname~="") and val.blipname or Config.blip.name,
             owner = val.owner,
-            owner_name = val.owner~=nil and namecache[val.owner].name or "None",
-            owner_rp_name = val.owner~=nil and namecache[val.owner].firstname.." "..namecache[val.owner].lastname or "None",
+            owner_name = hasowner and namecache[val.owner].name or "None",
+            owner_rp_name = hasowner and namecache[val.owner].firstname.." "..namecache[val.owner].lastname or "None",
             price = val.price,
             earnings = val.earnings,
             position = json.decode(val.position),
             stock_price = val.stock_price,
-            employees = val.employees~=nil and json.decode(val.employees) or {},
-            taxrate = val.taxrate~=nil and val.taxrate or Config.default_tax_rate
+            employees = (val.employees~=nil and val.employees~="") and json.decode(val.employees) or {},
+            taxrate = (val.taxrate~=nil and val.taxrate~="") and val.taxrate or Config.default_tax_rate
         }
     end
     print("esx_business: Synced "..tostring(#res).." business(es) from database")
