@@ -29,6 +29,7 @@ Translators:
 @NiT34ByTe - IT (Italian), RO (Romanian)  
 @NessFrg - BR (Brazilian)  
 @iSiKoZ - FR (French)  
+@CuPi - PL (Polish)  
 If you want to submit your own translation, make a pull request or shoot me a DM on discord!
 
 ## Important notes
