@@ -136,8 +136,8 @@ TriggerEvent('es:addGroupCommand', 'business', "superadmin", function(source, ar
             TriggerClientEvent("el_business:businessList", source)
         elseif args[1]=="create" then
             TriggerClientEvent("el_business:businessCreate", source)
-        elseif args[1]=="runcoros" then -- debug
-            runMoneyCoroutines(0,0,0)
+        --elseif args[1]=="runcoros" then -- debug
+            --runMoneyCoroutines(0,0,0)
         end
     else
         TriggerClientEvent('chat:addMessage', source, { args = { '^4Business', 'Wrong parameters, possible parameters are: ^2reload^7, ^2list^7, ^2create^7' } })
