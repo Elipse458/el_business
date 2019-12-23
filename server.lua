@@ -3,13 +3,21 @@ local dataCache,namecache = {},{}
 
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
+function _L(str)
+    if not Locale then return "Locale error" end
+    if not Locale[Config.locale] then return "Invalid locale" end
+    if not Locale[Config.locale][str] then return "Invalid string" end
+    return Locale[Config.locale][str]
+end
+
 function reloadServerData()
-    print("esx_business: Syncing businesses from database")
+    print("el_business: Syncing businesses from database")
     dataCahe = {}
     local res = MySQL.Sync.fetchAll('SELECT * FROM businesses')
     for key,val in ipairs(res) do
         hasowner = val.owner~=nil and val.owner~=""
         if hasowner and not namecache[val.owner] then namecache[val.owner]=MySQL.Sync.fetchAll("SELECT name,firstname,lastname FROM users WHERE identifier = @identifier",{["@identifier"]=val.owner})[1] end
+        if val.owner~=nil then namecache[val.owner] = namecache[val.owner]~=nil and namecache[val.owner] or {name="N/A",firstname="N/A",lastname="N/A"} end
         dataCache[val.id] = {
             id = val.id,
             name = val.name,
@@ -27,7 +35,7 @@ function reloadServerData()
             taxrate = (val.taxrate~=nil and val.taxrate~="") and val.taxrate or Config.default_tax_rate
         }
     end
-    print("esx_business: Synced "..tostring(#res).." business(es) from database")
+    print("el_business: Synced "..tostring(#res).." business(es) from database")
 end
 
 function addMoney(identifier,money,business)
@@ -36,21 +44,21 @@ function addMoney(identifier,money,business)
     local money = math.floor(tonumber(money))
     if source ~= nil then
         local xPlayer = ESX.GetPlayerFromId(source)
-        print("esx_business: Adding money to "..GetPlayerName(source).." - "..identifier.." ("..tostring(money).."$)")
-        TriggerClientEvent('esx:showNotification', source, 'You received ~g~'..tostring(money)..'$~s~ from ~b~'..business)
+        print("el_business: Adding money to "..GetPlayerName(source).." - "..identifier.." ("..tostring(money).."$)")
+        TriggerClientEvent('esx:showNotification', source, _L("received_money"):format(tostring(money),business))
         xPlayer.addAccountMoney("bank", math.floor(money))
     else
-        print("esx_business: An error occured while adding money to "..identifier.." ("..tostring(money).."$). The player is offline. Forcing adding money")
+        print("el_business: An error occured while adding money to "..identifier.." ("..tostring(money).."$). The player is offline. Forcing adding money")
         MySQL.Sync.execute('UPDATE `users` SET `bank` = `bank` + @bank WHERE `identifier` = @identifier',{['@bank'] = money, ['@identifier'] = identifier})
     end
 end
 
 function noStock(identifier,business)
     if not identifier or identifier==nil then return end
-    print("esx_business: Player "..identifier.." has no stock at "..business)
+    print("el_business: Player "..identifier.." has no stock at "..business)
     local source = getSourceFromId(identifier) -- xPlayer.source is bugges, it's always 1 
     if source ~= nil then
-        TriggerClientEvent('esx:showNotification', source, '~r~'..business..'~s~ is out of stock!')
+        TriggerClientEvent('esx:showNotification', source, _L("out_of_stock"):format(business))
     end
 end
 
@@ -69,7 +77,7 @@ end
 
 function runMoneyCoroutines(d,h,m)
     Citizen.CreateThread(function()
-        print("esx_business: Running money coroutines "..h..":"..m)
+        print("el_business: Running money coroutines "..h..":"..m)
         local businesses = MySQL.Async.fetchAll('SELECT * FROM businesses',{},function(data)
             for _,business in ipairs(data) do
                 if business["owner"]~=nil then
@@ -107,13 +115,13 @@ function reloadPlayersData()
     local xPlayers = ESX.GetPlayers()
     if #xPlayers<1 then return end
     for _,id in ipairs(xPlayers) do
-        TriggerClientEvent("esx_business:syncServer",id,dataCache)
+        TriggerClientEvent("el_business:syncServer",id,dataCache)
     end
 end
 
 AddEventHandler('es:playerLoaded', function(source, user)
     local _source = source
-    TriggerClientEvent("esx_business:syncServer",_source,dataCache)
+    TriggerClientEvent("el_business:syncServer",_source,dataCache)
 end)
 
 TriggerEvent('es:addGroupCommand', 'business', "superadmin", function(source, args, user)
@@ -125,11 +133,11 @@ TriggerEvent('es:addGroupCommand', 'business', "superadmin", function(source, ar
             TriggerClientEvent('chat:addMessage', source, { args = { '^4Business', 'Data loaded from database and synced' } })
         elseif args[1]=="list" then
             TriggerClientEvent('chat:addMessage', source, { args = { '^4Business', 'Business list will appear in F8 console' } })
-            TriggerClientEvent("esx_business:businessList", source)
+            TriggerClientEvent("el_business:businessList", source)
         elseif args[1]=="create" then
-            TriggerClientEvent("esx_business:businessCreate", source)
-        -- elseif args[1]=="runcoros" then -- debug
-        --     runMoneyCoroutines(0,0,0)
+            TriggerClientEvent("el_business:businessCreate", source)
+        elseif args[1]=="runcoros" then -- debug
+            runMoneyCoroutines(0,0,0)
         end
     else
         TriggerClientEvent('chat:addMessage', source, { args = { '^4Business', 'Wrong parameters, possible parameters are: ^2reload^7, ^2list^7, ^2create^7' } })
@@ -145,23 +153,23 @@ function isBusinessEmployee(employeelist,identifier)
     return false
 end
 
-ESX.RegisterServerCallback("esx_business:getNewEmployeeList",function(source,cb,business)
+ESX.RegisterServerCallback("el_business:getNewEmployeeList",function(source,cb,business)
     local players = {}
     for k,v in ipairs(ESX.GetPlayers()) do
         local xTarget = ESX.GetPlayerFromId(v)
         if v~=source and GetPlayerName(v)~=nil and not isBusinessEmployee(dataCache[business]["employees"],xTarget.identifier) then table.insert(players,{name=GetPlayerName(v),sid=v}) end
     end
-    if #players<1 then TriggerClientEvent('esx:showNotification', source, '~r~No people on the server'); return end
+    if #players<1 then TriggerClientEvent('esx:showNotification', source, _L("no_people_on_server")); return end
     cb(players)
 end)
 
-ESX.RegisterServerCallback("esx_business:getEmployeeList",function(source,cb,business)
+ESX.RegisterServerCallback("el_business:getEmployeeList",function(source,cb,business)
     local idssql,idvals = {},{}
     for k,v in ipairs(dataCache[business]["employees"]) do
         table.insert(idssql,"@identifier"..k)
         idvals["@identifier"..k]=v
     end
-    if #idssql<1 then TriggerClientEvent('esx:showNotification', source, '~r~Your employee list is empty'); return end
+    if #idssql<1 then TriggerClientEvent('esx:showNotification', source, _L("employee_list_empty")); return end
     MySQL.Async.fetchAll("SELECT name,identifier FROM users WHERE identifier IN ("..table.concat(idssql,",")..")",idvals,function(data)
         local employees = {}
         for k,v in ipairs(data) do
@@ -171,7 +179,7 @@ ESX.RegisterServerCallback("esx_business:getEmployeeList",function(source,cb,bus
     end)
 end)
 
-ESX.RegisterServerCallback("esx_business:hireEmployee",function(source,cb,newempid,business)
+ESX.RegisterServerCallback("el_business:hireEmployee",function(source,cb,newempid,business)
     local xPlayer = ESX.GetPlayerFromId(source)
     local xTarget = ESX.GetPlayerFromId(newempid)
     local identifier = xPlayer.identifier
@@ -186,7 +194,7 @@ ESX.RegisterServerCallback("esx_business:hireEmployee",function(source,cb,newemp
     end
 end)
 
-ESX.RegisterServerCallback("esx_business:fireEmployee",function(source,cb,fireid,business)
+ESX.RegisterServerCallback("el_business:fireEmployee",function(source,cb,fireid,business)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.identifier
     if dataCache[business]["owner"]==identifier then
@@ -202,12 +210,12 @@ ESX.RegisterServerCallback("esx_business:fireEmployee",function(source,cb,fireid
     end
 end)
 
-ESX.RegisterServerCallback("esx_business:getStock", function(source,cb,business)
+ESX.RegisterServerCallback("el_business:getStock", function(source,cb,business)
     local identifier = ESX.GetPlayerFromId(source).getIdentifier()
     if dataCache[business]["owner"]~=nil and dataCache[business]["owner"]==identifier or isBusinessEmployee(dataCache[business]["employees"],identifier) then cb(getStock(tonumber(business))) else cb(0) end
 end)
 
-ESX.RegisterServerCallback("esx_business:buyStock", function(source,cb,business,amt)
+ESX.RegisterServerCallback("el_business:buyStock", function(source,cb,business,amt)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     if dataCache[business]["owner"]==identifier or isBusinessEmployee(dataCache[business]["employees"],identifier) then
@@ -215,10 +223,10 @@ ESX.RegisterServerCallback("esx_business:buyStock", function(source,cb,business,
             xPlayer.removeMoney(dataCache[business]["stock_price"]*amt)
             local time = math.random(300,900)
             Citizen.CreateThread(function()
-                print("esx_business: Player "..identifier.." bought stock, delivering in: "..time.."s")
+                print("el_business: Player "..identifier.." bought stock, delivering in: "..time.."s")
                 Citizen.Wait(time*1000)
                 MySQL.Async.execute('UPDATE businesses SET stock = stock + @amt WHERE id = @business', {["@amt"] = tonumber(amt), ["@business"] = tonumber(business)}, nil)
-                TriggerClientEvent('esx:showNotification', source, 'Your stock for ~b~'..dataCache[business]["name"]..'~s~ has been delivered!')
+                TriggerClientEvent('esx:showNotification', source, _L("stock_delivered"):format(dataCache[business]["name"]))
             end)
             cb(true,time)
         else
@@ -229,7 +237,7 @@ ESX.RegisterServerCallback("esx_business:buyStock", function(source,cb,business,
     end
 end)
 
-ESX.RegisterServerCallback("esx_business:buyBusiness", function(source,cb,business)
+ESX.RegisterServerCallback("el_business:buyBusiness", function(source,cb,business)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     if dataCache[business]["owner"]==nil then
@@ -247,7 +255,7 @@ ESX.RegisterServerCallback("esx_business:buyBusiness", function(source,cb,busine
     end
 end)
 
-ESX.RegisterServerCallback("esx_business:sellBusiness", function(source,cb,business)
+ESX.RegisterServerCallback("el_business:sellBusiness", function(source,cb,business)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     if dataCache[business]["owner"]==identifier then
@@ -261,7 +269,7 @@ ESX.RegisterServerCallback("esx_business:sellBusiness", function(source,cb,busin
     end
 end)
 
-ESX.RegisterServerCallback("esx_business:createBusiness", function(source,cb,business)
+ESX.RegisterServerCallback("el_business:createBusiness", function(source,cb,business)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer.getGroup()=="superadmin" then
         if not business then cb(false) end
@@ -286,7 +294,7 @@ ESX.RegisterServerCallback("esx_business:createBusiness", function(source,cb,bus
 end)
 
 Citizen.CreateThread(function()
-    print("esx_business: Started!")
+    print("el_business: Started!")
     print("********************")
     print("WARNING: PLEASE DON\'T RESTART THIS SCRIPT, USE THE BUILTIN COMMAND /business reload TO RELOAD DATA FROM DATABASE")
     print("********************")

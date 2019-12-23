@@ -1,4 +1,6 @@
-Config = {}
+Config,Locale = {},{} -- no touchey, thanks
+
+Config.locale = "en"
 
 Config.draw_distance = 25.0
 
@@ -31,8 +33,9 @@ Config.display = {
 
 Config.blip = {
     enabled = false,
-    color = 29, -- https://wiki.gtanet.work/index.php?title=Blips
-    sprite = 106, -- https://wiki.gtanet.work/index.php?title=Blips
+    color = 5, -- https://wiki.gtanet.work/index.php?title=Blips
+    sprite = 475, -- https://wiki.gtanet.work/index.php?title=Blips
+    scale = 0.5,
     name = "Business"
 }
 

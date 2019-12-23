@@ -18,6 +18,19 @@ Commands:
 - /business list <- admin command, dumps list of current businesses into your console
 - /business reload <- admin command, reloads business data from database
 
+## Translations
+If you want to change your locale from `en` to some of the pre-made ones, here's how to do it
+- Change locale in config.lua to the desired one
+- Change line 6 and 12 in \_\_resource.lua your locale's filename (for example `locale/sk.lua`)
+- Start it and it should work (if not, restart your server)  
+
+Translators:  
+@Elipse458 - SK (Slovak), CZ (Czech)  
+@NiT34ByTe - IT (Italian), RO (Romanian)  
+@NessFrg - BR (Brazilian)  
+@iSiKoZ - FR (French)  
+If you want to submit your own translation, make a pull request or shoot me a DM on discord!
+
 ## Important notes
 **DO NOT RESTART THIS** - it requires a full server restart!  
 If you want to change the time when people receive money (default is every hour at :00) here's how you do it:  
