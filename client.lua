@@ -58,9 +58,9 @@ function OpenBusinessMenu(business)
     boss = true
     ESX.TriggerServerCallback("el_business:getStock", function(stock)
         local elements = {}
-        table.insert(elements,{label = _L("menu_stock")..": "..tostring(stock), value = ''})
-        table.insert(elements,{label = _L("menu_buy_stock")..' - <span style="color:green;">$'..tostring(business["stock_price"])..'</span>', label_real = 'buystock', value = 1, type = 'slider', min = 1, max = 100})
-        if business["owner"]==PlayerData.identifier then table.insert(elements,{label = _L("menu_sell_business")..' - <span style="color:red;">$'..tostring(math.floor(business["price"]*Config.sell_percentage))..'</span>', value = 'sellbusiness'}) end
+        table.insert(elements,{label = '<span style="float:left;margin-left:15px;">'.._L("menu_stock").."</span><span style='float:right;margin-right:15px;'>"..ESX.Math.GroupDigits(stock).."</span>", value = ''})
+        table.insert(elements,{label = '<span style="float:left;margin-left:15px;">'.._L("menu_buy_stock")..'</span><span style="color:green;float:right;margin-right:15px;">$'..ESX.Math.GroupDigits(business["stock_price"])..'</span>', label_real = 'buystock', value = 1, type = 'slider', min = 1, max = 100})
+        if business["owner"]==PlayerData.identifier then table.insert(elements,{label = '<span style="float:left;margin-left:15px;">'.._L("menu_sell_business")..'</span><span style="color:red;float:right;margin-right:15px;">$'..ESX.Math.GroupDigits(math.floor(business["price"]*Config.sell_percentage))..'</span>', value = 'sellbusiness'}) end
         if business["owner"]==PlayerData.identifier then table.insert(elements,{label = _L("menu_employee_list"), value = 'employeelist'}) end
         table.insert(elements,{label = _L("menu_exit"), value = 'exitmenu'})
         ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_boss',
@@ -158,6 +158,11 @@ function OpenBusinessMenu(business)
             end
         end, function(data, menu)
             menu.close(); boss=false
+        end, function(data, menu)
+            if data.current.label_real=="buystock" then
+                menu.setElement(2,"label",'<span style="float:left;margin-left:15px;">'.._L("menu_buy_stock")..'</span><span style="color:green;float:right;margin-right:15px;">$'..ESX.Math.GroupDigits(data.current.value*business["stock_price"])..'</span>')
+                menu.refresh()
+            end
         end)
     end, business["id"])
 end
@@ -171,7 +176,7 @@ function OpenBuyBusinessMenu(business)
         align = 'bottom-right',
         elements = {
             {label = _L("menu_no"),  value = 'no'},
-            {label = _L("menu_yes"), value = 'yes'},
+            {label = _L("menu_yes"), value = 'yes'}
         }
     }, function(data,menu)
         if data.current.value == 'yes' then
@@ -349,7 +354,7 @@ AddEventHandler("el_business:businessList",function()
             print("|-> Address: "..v["address"])
             print("|-> Description: "..v["description"])
             print("|-> Blip name: "..(v["blipname"]~=nil and v["blipname"] or Config.blip.name))
-            print("|-> Owner: "..(v["owner_name"]~=nil and v["owner_name"] or "N/A").." ("..(v["owner"]~=nil and v["owner"] or "N/A")..")")
+            print("|-> Owner: "..(v["owner_rp_name"]~=nil and v["owner_rp_name"] or "N/A").." ("..(v["owner"]~=nil and v["owner"] or "N/A")..")")
             print("|-> Price: "..v["price"].."$")
             print("|-> Stock price: "..v["stock_price"].."$")
             print("L-> Earnings: "..v["earnings"].."$/h")
