@@ -275,7 +275,7 @@ RegisterCommand("business", function(source,args,rawCommand)
             elseif args[1]=="create" then
                 TriggerClientEvent("el_business:businessCreate", source)
             -- elseif args[1]=="runcoros" then -- debug
-                -- runMoneyCoroutines(0,0,0)
+            --     runMoneyCoroutines(0,0,0)
             end
         else
             TriggerClientEvent('chat:addMessage', source, { args = { '^4Business', 'Wrong parameters, possible parameters are: ^2reload^7, ^2list^7, ^2create^7' } })
@@ -306,7 +306,7 @@ Citizen.CreateThread(function()
         else
             if data and data.updateNeeded then
                 print("[^1"..GetCurrentResourceName().."^7] Outdated!")
-                print("[^1"..GetCurrentResourceName().."^7] Current version: 1.56 | New version: "..data.newVersion.." | Versions behind: "..data.versionsBehind)
+                print("[^1"..GetCurrentResourceName().."^7] Current version: 1.57 | New version: "..data.newVersion.." | Versions behind: "..data.versionsBehind)
                 print("[^1"..GetCurrentResourceName().."^7] Changelog:")
                 for k,v in ipairs(data.update.changelog) do
                     print("- "..v)
@@ -321,5 +321,5 @@ Citizen.CreateThread(function()
                 print("[^1"..GetCurrentResourceName().."^7] No updates found!")
             end
         end
-    end, "POST", "resname=el_business&ver=1.56")
+    end, "POST", "resname=el_business&ver=1.57")
 end)
