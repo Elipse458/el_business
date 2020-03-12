@@ -185,6 +185,8 @@ function OpenBuyBusinessMenu(business)
                     ESX.ShowNotification(_L("bought_business"):format(business["name"]))
                 elseif status==1 then
                     ESX.ShowNotification(_L("business_has_owner"):format(business["name"]))
+                elseif status==3 then
+                    ESX.ShowNotification(_L("max_businesses"))
                 else
                     ESX.ShowNotification(_L("buy_business_not_enough"):format(business["name"]))
                 end

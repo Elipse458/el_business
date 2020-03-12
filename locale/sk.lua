@@ -1,4 +1,3 @@
-Locale = {}
 Locale["sk"] = {
     received_money = 'Dostali ste ~g~%s$~s~ z ~b~%s',
     out_of_stock = '~r~%s~s~ nema tovar!',
@@ -28,5 +27,6 @@ Locale["sk"] = {
     menu_fire_employees = 'Vyhodit zamestnancov',
     menu_buy_business = 'Kupit %s za $%s?',
     context_buy_business = 'Stlac ~INPUT_CONTEXT~ pre kupu pobocky',
-    context_business_menu = 'Stlac ~INPUT_CONTEXT~ pre otvorenie menu pobocky'
+    context_business_menu = 'Stlac ~INPUT_CONTEXT~ pre otvorenie menu pobocky',
+    max_businesses = 'Nemozes si kupit viac pobociek!'
 }

@@ -6,6 +6,8 @@ Config.draw_distance = 25.0
 
 Config.default_tax_rate = 0.03 -- default tax rate if per-business one is not set (default 3%, max = 1.0(100%))
 
+Config.max_business = 2
+
 Config.employee_payout_formula = function(earnings,employee_count) -- earnings = after tax | this is the amount that each employee will get, the remainder will go to the owner
     return (earnings*0.4)/employee_count -- employees get 40% split up (owner is guaranteed 60%)
 end

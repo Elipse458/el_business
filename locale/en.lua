@@ -27,5 +27,6 @@ Locale["en"] = {
     menu_fire_employees = 'Fire employees',
     menu_buy_business = 'Buy %s for $%s?', -- business name, money
     context_buy_business = 'Hit ~INPUT_CONTEXT~ to buy business',
-    context_business_menu = 'Hit ~INPUT_CONTEXT~ to open business menu'
+    context_business_menu = 'Hit ~INPUT_CONTEXT~ to open business menu',
+    max_businesses = 'You can\'t buy more businesses!'
 }

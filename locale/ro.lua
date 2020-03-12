@@ -27,5 +27,6 @@ Locale["ro"] = {
     menu_fire_employees = 'Concediaza muncitori',
     menu_buy_business = 'Cumpara afacerea %s pentru $%s?',
     context_buy_business = 'Apasa ~INPUT_CONTEXT~ pentru a cumpara afacerea',
-    context_business_menu = 'Apasa ~INPUT_CONTEXT~ pentru a deschide meniul afacerei'
+    context_business_menu = 'Apasa ~INPUT_CONTEXT~ pentru a deschide meniul afacerei',
+    max_businesses = 'You can\'t buy more businesses!'
 }

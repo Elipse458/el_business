@@ -91,18 +91,23 @@ TriggerEvent('esx:getSharedObject', function(obj)
     ESX.RegisterServerCallback("el_business:buyBusiness", function(source,cb,business)
         local xPlayer = ESX.GetPlayerFromId(source)
         local identifier = xPlayer.getIdentifier()
-        if dataCache[business]["owner"]==nil then
-            if xPlayer.getMoney()>=dataCache[business]["price"] then
-                dataCache[business]["owner"]=identifier -- counteract the loading time from db (player can accidentally buy twice)
-                xPlayer.removeMoney(dataCache[business]["price"])
-                MySQL.Sync.execute('UPDATE businesses SET owner = @identifier WHERE id = @business', {["@identifier"] = identifier, ["@business"] = tonumber(business)}, nil)
-                Citizen.CreateThread(function() reloadServerData();reloadPlayersData() end)
-                cb(0)
-            else
-                cb(2)
-            end
+        local business_count = MySQL.Sync.fetchScalar("SELECT COUNT(id) FROM businesses WHERE owner=@owner",{["@owner"]=identifier})
+        if business_count>=Config.max_business then
+            cb(3)
         else
-            cb(1)
+            if dataCache[business]["owner"]==nil then
+                if xPlayer.getMoney()>=dataCache[business]["price"] then
+                    dataCache[business]["owner"]=identifier -- counteract the loading time from db (player can accidentally buy twice)
+                    xPlayer.removeMoney(dataCache[business]["price"])
+                    MySQL.Sync.execute('UPDATE businesses SET owner = @identifier WHERE id = @business', {["@identifier"] = identifier, ["@business"] = tonumber(business)}, nil)
+                    Citizen.CreateThread(function() reloadServerData();reloadPlayersData() end)
+                    cb(0)
+                else
+                    cb(2)
+                end
+            else
+                cb(1)
+            end
         end
     end)
     
@@ -269,8 +274,8 @@ RegisterCommand("business", function(source,args,rawCommand)
                 TriggerClientEvent("el_business:businessList", source)
             elseif args[1]=="create" then
                 TriggerClientEvent("el_business:businessCreate", source)
-            elseif args[1]=="runcoros" then -- debug
-                runMoneyCoroutines(0,0,0)
+            -- elseif args[1]=="runcoros" then -- debug
+                -- runMoneyCoroutines(0,0,0)
             end
         else
             TriggerClientEvent('chat:addMessage', source, { args = { '^4Business', 'Wrong parameters, possible parameters are: ^2reload^7, ^2list^7, ^2create^7' } })

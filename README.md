@@ -36,10 +36,10 @@ If you want to submit your own translation, make a pull request or shoot me a DM
 ## Important notes
 **DO NOT RESTART THIS** - it requires a full server restart!  
 If you want to change the time when people receive money (default is every hour at :00) here's how you do it:  
-- Open `server.lua` and go to [line 294](https://github.com/Elipse458/el_business/blob/master/server.lua#L294)
+- Open `server.lua` and go to [line 299](https://github.com/Elipse458/el_business/blob/master/server.lua#L299)
 - Change the '0' in `TriggerEvent("cron:runAt",i, *0* ,runMoneyCoroutines)` to a number between 0-59, that will be the minute when it gets executed  
 If you want to change the hours, i'll let you figure that out on your own as an exercise lol ([cron](https://github.com/ESX-Org/cron))
-- If the script doesn't give money to the player, try changing [line 189](https://github.com/Elipse458/el_business/blob/master/server.lua#L189) in server.lua to `xPlayer.addMoney(math.floor(money))`  
+- If the script doesn't give money to the player, try changing [line 194](https://github.com/Elipse458/el_business/blob/master/server.lua#L194) in server.lua to `xPlayer.addMoney(math.floor(money))`  
 
 If you have someone in the businesses set as an owner of a business and their identifier is no longer in the users database, you need to set the owner of that business back to NULL. Here's a sql query that can do all of that automagically (might take longer with big users table)
 ```sql

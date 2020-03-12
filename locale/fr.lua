@@ -27,5 +27,6 @@ Locale["fr"] = {
     menu_fire_employees = 'Licencier',
     menu_buy_business = 'Acheter %s pour $%s ?',
     context_buy_business = 'Appuyez sur ~INPUT_CONTEXT~ pour acheter l\'entreprise',
-    context_business_menu = 'Appuyez sur ~INPUT_CONTEXT~ pour ouvrir le menu l\'entreprise'
+    context_business_menu = 'Appuyez sur ~INPUT_CONTEXT~ pour ouvrir le menu l\'entreprise',
+    max_businesses = 'You can\'t buy more businesses!'
 }

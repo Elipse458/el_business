@@ -27,5 +27,6 @@ Locale["cz"] = {
     menu_fire_employees = 'Vyhodit zamestnance',
     menu_buy_business = 'Koupit %s za $%s?',
     context_buy_business = 'Stiskni ~INPUT_CONTEXT~ pro koupu pobocky',
-    context_business_menu = 'Stiskni ~INPUT_CONTEXT~ pro otevreni menu pobocky'
+    context_business_menu = 'Stiskni ~INPUT_CONTEXT~ pro otevreni menu pobocky',
+    max_businesses = 'Nemuzes si koupit vic pobocek!'
 }
