@@ -300,10 +300,10 @@ Citizen.CreateThread(function()
     end
     print("[^1"..GetCurrentResourceName().."^7] Performing version check...")
     PerformHttpRequest("https://api.elipse458.me/resources/checkupdates.php", function(a,b,c)
-        local data = json.decode(b)
         if a~=200 then
             print("[^1"..GetCurrentResourceName().."^7] Version check failed!")
         else
+            local data = json.decode(b)
             if data and data.updateNeeded then
                 print("[^1"..GetCurrentResourceName().."^7] Outdated!")
                 print("[^1"..GetCurrentResourceName().."^7] Current version: 1.57 | New version: "..data.newVersion.." | Versions behind: "..data.versionsBehind)
