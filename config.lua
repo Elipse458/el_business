@@ -1,8 +1,12 @@
-Config = {}
+Config,Locale = {},{} -- no touchey, thanks
+
+Config.locale = "en"
 
 Config.draw_distance = 25.0
 
 Config.default_tax_rate = 0.03 -- default tax rate if per-business one is not set (default 3%, max = 1.0(100%))
+
+Config.max_business = 2
 
 Config.employee_payout_formula = function(earnings,employee_count) -- earnings = after tax | this is the amount that each employee will get, the remainder will go to the owner
     return (earnings*0.4)/employee_count -- employees get 40% split up (owner is guaranteed 60%)
@@ -14,7 +18,6 @@ end
 -- {description} - desctiption of the business
 -- {blipname} - custom blip name (default Config.blip.name)
 -- {owner} - owner steamid (default nil)
--- {owner_name} - owner steam name (default 'None')
 -- {owner_rp_name} - owner RP name (default 'None')
 -- {earnings} - business earnings/hr
 -- {price} - business price
@@ -31,8 +34,9 @@ Config.display = {
 
 Config.blip = {
     enabled = false,
-    color = 29, -- https://wiki.gtanet.work/index.php?title=Blips
-    sprite = 106, -- https://wiki.gtanet.work/index.php?title=Blips
+    color = 5, -- https://wiki.gtanet.work/index.php?title=Blips
+    sprite = 475, -- https://wiki.gtanet.work/index.php?title=Blips
+    scale = 0.5,
     name = "Business"
 }
 
