@@ -1,3 +1,4 @@
+We, the Headquarters, did not make this resource. We only updated it to ESX v1-final.
 # el_business
 Business system for FiveM (ESX)  
 Buy a business, order stock and get money every irl hour!
