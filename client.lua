@@ -3,10 +3,10 @@ local PlayerData = nil
 local businessData,blips = {},{}
 local boss,buy,currentmenu = false,false,nil
 
-Citizen.CreateThread(function()
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		Citizen.Wait(0)
+CreateThread(function()
+    while ESX == nil do
+        TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+        Wait(0)
     end
     if PlayerData==nil then PlayerData = ESX.GetPlayerData() end
 end)
@@ -29,7 +29,7 @@ function disp_time(time)
     return string.format("~b~%02d~s~m ~b~%02d~s~s",minutes,seconds)
 end
 
-function DrawText3D(x,y,z, text, scl) 
+function DrawText3D(x,y,z, text, scl)
     local onScreen,_x,_y=World3dToScreen2d(x,y,z)
     local px,py,pz=table.unpack(GetGameplayCamCoords())
     local dist = GetDistanceBetweenCoords(px,py,pz, x,y,z, 1)
@@ -64,106 +64,106 @@ function OpenBusinessMenu(business)
         if business["owner"]==PlayerData.identifier then table.insert(elements,{label = _L("menu_employee_list"), value = 'employeelist'}) end
         table.insert(elements,{label = _L("menu_exit"), value = 'exitmenu'})
         ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_boss',
-        {
-            title = business["name"],
-            align = 'bottom-right',
-            elements = elements
-        }, function(data, menu)
-            if data.current.label_real == 'buystock' then
-                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_confirm_stock', {
-                    title    = _L("menu_buystock_confirm"):format(data.current.value,business["stock_price"]*data.current.value),
-                    align    = 'bottom-right',
-                    elements = {
-                        {label = _L("menu_no"),  value = 'no'},
-                        {label = _L("menu_yes"), value = 'yes'},
-                    }
-                }, function(data2, menu2)
-                    if data2.current.value == 'yes' then
-                        ESX.TriggerServerCallback("el_business:buyStock", function(success,time)
-                            if success then
-                                ESX.ShowNotification(_L("bought_stock"):format(disp_time(time)))
-                            else ESX.ShowNotification(_L("not_enough_money")) end
-                        end,business["id"],data.current.value)
-                    end
-                    menu2.close()
-                end, function(data2, menu2) menu2.close() end)
-            elseif data.current.value == 'sellbusiness' then
-                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_confirm_sellbusiness', {
-                    title    = _L("menu_sellbusiness_confirm"):format(business["name"],math.floor(business["price"]*Config.sell_percentage)),
-                    align    = 'bottom-right',
-                    elements = {
-                        {label = _L("menu_no"),  value = 'no'},
-                        {label = _L("menu_yes"), value = 'yes'},
-                    }
-                }, function(data2, menu2)
-                    if data2.current.value == 'yes' then
-                        ESX.TriggerServerCallback("el_business:sellBusiness", function(success)
-                            if success then
-                                ESX.ShowNotification(_L("sold_business"):format(math.floor(business["price"]*Config.sell_percentage)))
-                            else ESX.ShowNotification(_L("error")) end
-                        end,business["id"])
-                    end
-                    menu2.close()
-                end, function(data2, menu2) menu2.close() end)
+            {
+                title = business["name"],
+                align = 'bottom-right',
+                elements = elements
+            }, function(data, menu)
+                if data.current.label_real == 'buystock' then
+                    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_confirm_stock', {
+                        title    = _L("menu_buystock_confirm"):format(data.current.value,business["stock_price"]*data.current.value),
+                        align    = 'bottom-right',
+                        elements = {
+                            {label = _L("menu_no"),  value = 'no'},
+                            {label = _L("menu_yes"), value = 'yes'},
+                        }
+                    }, function(data2, menu2)
+                        if data2.current.value == 'yes' then
+                            ESX.TriggerServerCallback("el_business:buyStock", function(success,time)
+                                if success then
+                                    ESX.ShowNotification(_L("bought_stock"):format(disp_time(time)))
+                                else ESX.ShowNotification(_L("not_enough_money")) end
+                            end,business["id"],data.current.value)
+                        end
+                        menu2.close()
+                    end, function(data2, menu2) menu2.close() end)
+                elseif data.current.value == 'sellbusiness' then
+                    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_confirm_sellbusiness', {
+                        title    = _L("menu_sellbusiness_confirm"):format(business["name"],math.floor(business["price"]*Config.sell_percentage)),
+                        align    = 'bottom-right',
+                        elements = {
+                            {label = _L("menu_no"),  value = 'no'},
+                            {label = _L("menu_yes"), value = 'yes'},
+                        }
+                    }, function(data2, menu2)
+                        if data2.current.value == 'yes' then
+                            ESX.TriggerServerCallback("el_business:sellBusiness", function(success)
+                                if success then
+                                    ESX.ShowNotification(_L("sold_business"):format(math.floor(business["price"]*Config.sell_percentage)))
+                                else ESX.ShowNotification(_L("error")) end
+                            end,business["id"])
+                        end
+                        menu2.close()
+                    end, function(data2, menu2) menu2.close() end)
+                    menu.close(); boss=false
+                elseif data.current.value=="employeelist" then
+                    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_employeemenu_choice', {
+                        title    = business["name"]..' - '.._L("menu_employees"),
+                        align    = 'bottom-right',
+                        elements = {
+                            {label = _L("menu_hire_employees"),  value = 'hire'},
+                            {label = _L("menu_fire_employees"), value = 'fire'},
+                        }
+                    }, function(data2, menu2)
+                        if data2.current.value=="hire" then
+                            ESX.TriggerServerCallback("el_business:getNewEmployeeList",function(newemployees)
+                                local newemployeeselements = {}
+                                for k,v in ipairs(newemployees) do
+                                    table.insert(newemployeeselements,{label=v.name.." - "..v.sid,sid=v.sid})
+                                end
+                                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_employeemenu_hire', {
+                                    title    = business["name"]..' - '.._L("menu_hire_employees"),
+                                    align    = 'bottom-right',
+                                    elements = newemployeeselements
+                                }, function(data3, menu3)
+                                    ESX.TriggerServerCallback("el_business:hireEmployee",function(isok)
+                                        ESX.ShowNotification(isok and _L("hired_employee") or _L("error"))
+                                    end, data3.current.sid, business["id"])
+                                    menu3.close(); boss=false
+                                end, function(data3, menu3) menu3.close(); boss=false end)
+                            end, business["id"])
+                        elseif data2.current.value=="fire" then
+                            ESX.TriggerServerCallback("el_business:getEmployeeList",function(employees)
+                                local employeeselements = {}
+                                for k,v in ipairs(employees) do
+                                    table.insert(employeeselements,{label=v.name,identifier=v.identifier})
+                                end
+                                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_employeemenu_fire', {
+                                    title    = business["name"]..' - '.._L("menu_fire_employees"),
+                                    align    = 'bottom-right',
+                                    elements = employeeselements
+                                }, function(data3, menu3)
+                                    ESX.TriggerServerCallback("el_business:fireEmployee",function(isok)
+                                        ESX.ShowNotification(isok and _L("fired_employee") or _L("error"))
+                                    end, data3.current.identifier, business["id"])
+                                    menu3.close(); boss=false
+                                end, function(data3, menu3) menu3.close(); boss=false end)
+                            end, business["id"])
+                        end
+                        menu2.close(); boss=false
+                    end, function(data2, menu2) menu2.close(); boss = false end)
+                    menu.close()
+                else
+                    menu.close(); boss=false
+                end
+            end, function(data, menu)
                 menu.close(); boss=false
-            elseif data.current.value=="employeelist" then
-                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_employeemenu_choice', {
-                    title    = business["name"]..' - '.._L("menu_employees"),
-                    align    = 'bottom-right',
-                    elements = {
-                        {label = _L("menu_hire_employees"),  value = 'hire'},
-                        {label = _L("menu_fire_employees"), value = 'fire'},
-                    }
-                }, function(data2, menu2)
-                    if data2.current.value=="hire" then
-                        ESX.TriggerServerCallback("el_business:getNewEmployeeList",function(newemployees)
-                            local newemployeeselements = {}
-                            for k,v in ipairs(newemployees) do
-                                table.insert(newemployeeselements,{label=v.name.." - "..v.sid,sid=v.sid})
-                            end
-                            ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_employeemenu_hire', {
-                                title    = business["name"]..' - '.._L("menu_hire_employees"),
-                                align    = 'bottom-right',
-                                elements = newemployeeselements
-                            }, function(data3, menu3)
-                                ESX.TriggerServerCallback("el_business:hireEmployee",function(isok)
-                                    ESX.ShowNotification(isok and _L("hired_employee") or _L("error"))
-                                end, data3.current.sid, business["id"])
-                                menu3.close(); boss=false
-                            end, function(data3, menu3) menu3.close(); boss=false end)
-                        end, business["id"])
-                    elseif data2.current.value=="fire" then
-                        ESX.TriggerServerCallback("el_business:getEmployeeList",function(employees)
-                            local employeeselements = {}
-                            for k,v in ipairs(employees) do
-                                table.insert(employeeselements,{label=v.name,identifier=v.identifier})
-                            end
-                            ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_employeemenu_fire', {
-                                title    = business["name"]..' - '.._L("menu_fire_employees"),
-                                align    = 'bottom-right',
-                                elements = employeeselements
-                            }, function(data3, menu3)
-                                ESX.TriggerServerCallback("el_business:fireEmployee",function(isok)
-                                    ESX.ShowNotification(isok and _L("fired_employee") or _L("error"))
-                                end, data3.current.identifier, business["id"])
-                                menu3.close(); boss=false
-                            end, function(data3, menu3) menu3.close(); boss=false end)
-                        end, business["id"])
-                    end
-                    menu2.close(); boss=false
-                end, function(data2, menu2) menu2.close(); boss = false end)
-                menu.close()
-            else
-                menu.close(); boss=false
-            end
-        end, function(data, menu)
-            menu.close(); boss=false
-        end, function(data, menu)
-            if data.current.label_real=="buystock" then
-                menu.setElement(2,"label",'<span style="float:left;margin-left:15px;">'.._L("menu_buy_stock")..'</span><span style="color:green;float:right;margin-right:15px;">$'..ESX.Math.GroupDigits(data.current.value*business["stock_price"])..'</span>')
-                menu.refresh()
-            end
-        end)
+            end, function(data, menu)
+                if data.current.label_real=="buystock" then
+                    menu.setElement(2,"label",'<span style="float:left;margin-left:15px;">'.._L("menu_buy_stock")..'</span><span style="color:green;float:right;margin-right:15px;">$'..ESX.Math.GroupDigits(data.current.value*business["stock_price"])..'</span>')
+                    menu.refresh()
+                end
+            end)
     end, business["id"])
 end
 
@@ -171,31 +171,31 @@ function OpenBuyBusinessMenu(business)
     if buy then ESX.UI.Menu.Close("default",GetCurrentResourceName(),"business_buy") end
     buy = true
     ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_buy',
-    {
-        title = _L("menu_buy_business"):format(business["name"],business["price"]),
-        align = 'bottom-right',
-        elements = {
-            {label = _L("menu_no"),  value = 'no'},
-            {label = _L("menu_yes"), value = 'yes'}
-        }
-    }, function(data,menu)
-        if data.current.value == 'yes' then
-            ESX.TriggerServerCallback("el_business:buyBusiness",function(status)
-                if status==0 then
-                    ESX.ShowNotification(_L("bought_business"):format(business["name"]))
-                elseif status==1 then
-                    ESX.ShowNotification(_L("business_has_owner"):format(business["name"]))
-                elseif status==3 then
-                    ESX.ShowNotification(_L("max_businesses"))
-                else
-                    ESX.ShowNotification(_L("buy_business_not_enough"):format(business["name"]))
-                end
-            end,business["id"])
-        end
-        menu.close(); buy = false
-    end, function(data,menu)
-        menu.close(); buy = false
-    end)
+        {
+            title = _L("menu_buy_business"):format(business["name"],business["price"]),
+            align = 'bottom-right',
+            elements = {
+                {label = _L("menu_no"),  value = 'no'},
+                {label = _L("menu_yes"), value = 'yes'}
+            }
+        }, function(data,menu)
+            if data.current.value == 'yes' then
+                ESX.TriggerServerCallback("el_business:buyBusiness",function(status)
+                    if status==0 then
+                        ESX.ShowNotification(_L("bought_business"):format(business["name"]))
+                    elseif status==1 then
+                        ESX.ShowNotification(_L("business_has_owner"):format(business["name"]))
+                    elseif status==3 then
+                        ESX.ShowNotification(_L("max_businesses"))
+                    else
+                        ESX.ShowNotification(_L("buy_business_not_enough"):format(business["name"]))
+                    end
+                end,business["id"])
+            end
+            menu.close(); buy = false
+        end, function(data,menu)
+            menu.close(); buy = false
+        end)
 end
 
 function OpenParameterDialog(length)
@@ -220,83 +220,83 @@ end
 
 function OpenCreateBusinessMenu()
     ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_create',
-    {
-        title = "Create business",
-        align = 'bottom-right',
-        elements = {
-            {label = '<span style="color:red;">Your current position will be used</span>', action = ''},
-            {label = 'Name: ', action = 'name', value = '', key = 2},
-            {label = 'Description: ', action = 'desc', value = '', key = 3},
-            {label = 'Address: ', action = 'address', value = '', key = 4},
-            {label = 'Blip name: ', action = 'blipname', value = '', key = 5},
-            {label = 'Price: ', action = 'price', value = '', key = 6},
-            {label = 'Earnings: ', action = 'earnings', value = '', key = 7},
-            {label = 'Stock price: ', action = 'stock_price', value = '', key = 8},
-            {label = 'Tax rate: ', action = 'taxrate', value = '', key = 9},
-            {label = '<span style="color:red;">Tax rate is in % 0.1=10% - 1.0=100%</span>', action = ''},
-            {label = 'Create business', action = 'create'},
-            {label = 'Discard business', action = 'discard'}
-        }
-    }, function(data,menu)
-        if data.current.action == 'name' then
-            data.current.value = OpenParameterDialog(255)
-            data.current.label = 'Name: '..data.current.value
-        elseif data.current.action == 'desc' then
-            data.current.value = OpenParameterDialog(75)
-            data.current.label = 'Description: '..data.current.value
-        elseif data.current.action == 'address' then
-            data.current.value = OpenParameterDialog(255)
-            data.current.label = 'Address: '..data.current.value
-        elseif data.current.action == 'price' then
-            data.current.value = tonumber(OpenParameterDialog(11))
-            data.current.label = 'Price: '..tostring(data.current.value)
-        elseif data.current.action == 'earnings' then
-            data.current.value = tonumber(OpenParameterDialog(11))
-            data.current.label = 'Earnings: '..tostring(data.current.value)
-        elseif data.current.action == 'blipname' then
-            data.current.value = OpenParameterDialog(75)
-            data.current.label = 'Blip name: '..tostring(data.current.value)
-        elseif data.current.action == 'stock_price' then
-            data.current.value = tonumber(OpenParameterDialog(11))
-            data.current.label = 'Stock price: '..tostring(data.current.value)
-        elseif data.current.action == 'taxrate' then
-            data.current.value = tonumber(OpenParameterDialog(11))
-            data.current.label = 'Tax rate: '..tostring(data.current.value)
-        elseif data.current.action == 'create' then
-            local error = false
-            for _,v in ipairs(menu.data.elements) do if v.key~=nil and v.key~=5 and (v.value==nil or v.value=='') then error = true end end
-            if not error then
-                local buypos = GetEntityCoords(GetPlayerPed(-1))
-                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_create_actionpos', {title="Please select the boss action location",align="bottom-right",elements={{label='<span style="color:red;">Your current position will be used</span>',action=''},{label="Set position",action="setpos"},{label="Cancel",action="cancel"}}},function(data1,menu1) if data1.current.action=="setpos" then 
-                    local business = {
-                        name = menu.data.elements[2].value,
-                        address = menu.data.elements[4].value,
-                        description = menu.data.elements[3].value,
-                        price = menu.data.elements[6].value,
-                        earnings = menu.data.elements[7].value,
-                        blipname = menu.data.elements[5].value=="" and nil or menu.data.elements[5].value,
-                        buy_position = buypos,
-                        actions_position = GetEntityCoords(GetPlayerPed(-1)),
-                        stock_price = menu.data.elements[8].value,
-                        taxrate = menu.data.elements[9].value=="" and nil or menu.data.elements[9].value
-                    }
-                    ESX.ShowNotification("~b~Creating business...")
-                    menu1.close()
-                    ESX.TriggerServerCallback("el_business:createBusiness", function(diditwork)
-                        if diditwork then ESX.ShowNotification("~g~Business created!") else ESX.ShowNotification("~r~There was an error creating the business") end
-                    end,business)
-                elseif data1.current.action=="cancel" then menu1.close() end end,function(data1,menu1) menu1.close() end)
+        {
+            title = "Create business",
+            align = 'bottom-right',
+            elements = {
+                {label = '<span style="color:red;">Your current position will be used</span>', action = ''},
+                {label = 'Name: ', action = 'name', value = '', key = 2},
+                {label = 'Description: ', action = 'desc', value = '', key = 3},
+                {label = 'Address: ', action = 'address', value = '', key = 4},
+                {label = 'Blip name: ', action = 'blipname', value = '', key = 5},
+                {label = 'Price: ', action = 'price', value = '', key = 6},
+                {label = 'Earnings: ', action = 'earnings', value = '', key = 7},
+                {label = 'Stock price: ', action = 'stock_price', value = '', key = 8},
+                {label = 'Tax rate: ', action = 'taxrate', value = '', key = 9},
+                {label = '<span style="color:red;">Tax rate is in % 0.1=10% - 1.0=100%</span>', action = ''},
+                {label = 'Create business', action = 'create'},
+                {label = 'Discard business', action = 'discard'}
+            }
+        }, function(data,menu)
+            if data.current.action == 'name' then
+                data.current.value = OpenParameterDialog(255)
+                data.current.label = 'Name: '..data.current.value
+            elseif data.current.action == 'desc' then
+                data.current.value = OpenParameterDialog(75)
+                data.current.label = 'Description: '..data.current.value
+            elseif data.current.action == 'address' then
+                data.current.value = OpenParameterDialog(255)
+                data.current.label = 'Address: '..data.current.value
+            elseif data.current.action == 'price' then
+                data.current.value = tonumber(OpenParameterDialog(11))
+                data.current.label = 'Price: '..tostring(data.current.value)
+            elseif data.current.action == 'earnings' then
+                data.current.value = tonumber(OpenParameterDialog(11))
+                data.current.label = 'Earnings: '..tostring(data.current.value)
+            elseif data.current.action == 'blipname' then
+                data.current.value = OpenParameterDialog(75)
+                data.current.label = 'Blip name: '..tostring(data.current.value)
+            elseif data.current.action == 'stock_price' then
+                data.current.value = tonumber(OpenParameterDialog(11))
+                data.current.label = 'Stock price: '..tostring(data.current.value)
+            elseif data.current.action == 'taxrate' then
+                data.current.value = tonumber(OpenParameterDialog(11))
+                data.current.label = 'Tax rate: '..tostring(data.current.value)
+            elseif data.current.action == 'create' then
+                local error = false
+                for _,v in ipairs(menu.data.elements) do if v.key~=nil and v.key~=5 and (v.value==nil or v.value=='') then error = true end end
+                if not error then
+                    local buypos = GetEntityCoords(PlayerPedId())
+                    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'business_create_actionpos', {title="Please select the boss action location",align="bottom-right",elements={{label='<span style="color:red;">Your current position will be used</span>',action=''},{label="Set position",action="setpos"},{label="Cancel",action="cancel"}}},function(data1,menu1) if data1.current.action=="setpos" then
+                        local business = {
+                            name = menu.data.elements[2].value,
+                            address = menu.data.elements[4].value,
+                            description = menu.data.elements[3].value,
+                            price = menu.data.elements[6].value,
+                            earnings = menu.data.elements[7].value,
+                            blipname = menu.data.elements[5].value=="" and nil or menu.data.elements[5].value,
+                            buy_position = buypos,
+                            actions_position = GetEntityCoords(PlayerPedId()),
+                            stock_price = menu.data.elements[8].value,
+                            taxrate = menu.data.elements[9].value=="" and nil or menu.data.elements[9].value
+                        }
+                        ESX.ShowNotification("~b~Creating business...")
+                        menu1.close()
+                        ESX.TriggerServerCallback("el_business:createBusiness", function(diditwork)
+                            if diditwork then ESX.ShowNotification("~g~Business created!") else ESX.ShowNotification("~r~There was an error creating the business") end
+                        end,business)
+                    elseif data1.current.action=="cancel" then menu1.close() end end,function(data1,menu1) menu1.close() end)
+                    menu.close()
+                else
+                    ESX.ShowNotification("~r~Data error, check your values.")
+                end
+            elseif data.current.action == 'discard' then
                 menu.close()
-            else
-                ESX.ShowNotification("~r~Data error, check your values.")
             end
-        elseif data.current.action == 'discard' then
+            if data.current.key~=nil then menu.setElement(data.current.key, "label", data.current.label); menu.setElement(data.current.key, "value", data.current.value); menu.refresh() end
+        end, function(data,menu)
             menu.close()
-        end
-        if data.current.key~=nil then menu.setElement(data.current.key, "label", data.current.label); menu.setElement(data.current.key, "value", data.current.value); menu.refresh() end
-    end, function(data,menu)
-        menu.close()
-    end)
+        end)
 end
 
 function replaceVariablesInString(str,business)
@@ -336,7 +336,7 @@ AddEventHandler("el_business:syncServer",function(data)
         end
     end
     businessData = data
-    -- Citizen.Trace("Received business data from server")
+    -- Trace("Received business data from server")
 end)
 
 RegisterNetEvent("el_business:businessCreate")
@@ -366,15 +366,17 @@ AddEventHandler("el_business:businessList",function()
     end
 end)
 
-Citizen.CreateThread(function()
-    Citizen.Wait(1500)
+CreateThread(function()
+    Wait(1500)
     while true do
-        local ped = GetPlayerPed(-1)
+        local sleep = true
+        local ped = PlayerPedId()
         local ppos = GetEntityCoords(ped)
-        Citizen.Wait(10) -- change this to 0 if you're experiencing flickering
+        Wait(10) -- change this to 0 if you're experiencing flickering
         for id,business in pairs(businessData) do
             local x,y,z = business.position.buy.x,business.position.buy.y,business.position.buy.z
             if GetDistanceBetweenCoords(ppos,x,y,z,false)<Config.draw_distance then
+                sleep = false
                 if business.owner==nil then
                     if GetDistanceBetweenCoords(ppos,x,y,z,false)<2.0 and not buy then
                         ESX.ShowHelpNotification(_L("context_buy_business"))
@@ -395,16 +397,19 @@ Citizen.CreateThread(function()
                 end
             end
         end
+        if sleep then Wait(1000) end
     end
 end)
 
-Citizen.CreateThread(function() -- draw thread
+CreateThread(function() -- draw thread
     while true do
-        Citizen.Wait(5)
-        local ppos = GetEntityCoords(GetPlayerPed(-1))
+        Wait(5)
+        local sleep = true
+        local ppos = GetEntityCoords(PlayerPedId())
         for _,business in pairs(businessData) do
             local x,y,z = business.position.buy.x,business.position.buy.y,business.position.buy.z
             if GetDistanceBetweenCoords(ppos,x,y,z,false)<Config.draw_distance then
+                sleep = false
                 for k,v in ipairs(Config.display) do
                     DrawText3D(x,y,z+0.5+v.offset,business.display[k],v.scale)
                 end
@@ -416,5 +421,6 @@ Citizen.CreateThread(function() -- draw thread
                 end
             end
         end
+        if sleep then Wait(1000) end
     end
 end)
